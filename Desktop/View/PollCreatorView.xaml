@@ -1,0 +1,95 @@
+﻿<Window x:Class="Desktop.View.PollCreatorView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Desktop.View"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+       Title="Book Edit - Item editor" Height="Auto" Width="400"
+        ResizeMode="NoResize" SizeToContent="Height">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding CancelBookEditCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Content="Kérdés:" VerticalAlignment="Center" />
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5"
+                 Text="{Binding NewPoll.Question, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Label Grid.Row="1" Grid.Column="0" Content="Start:" VerticalAlignment="Center" />
+        <xctk:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" Format="FullDateTime"
+                  Value ="{Binding Start , UpdateSourceTrigger=PropertyChanged}" />
+
+        <Label Grid.Row="2" Grid.Column="0" Content="Start:" VerticalAlignment="Center" />
+        <xctk:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5" Format="FullDateTime"
+                  Value ="{Binding End , UpdateSourceTrigger=PropertyChanged}" />
+        
+        <Label Grid.Row="4" Grid.Column="0" Content="Választható Opciók:" VerticalAlignment="Center" />
+        <DataGrid Grid.Row="4" Grid.Column="1" ItemsSource="{Binding NewAnswers}"
+                      VerticalContentAlignment="Stretch"  IsReadOnly="True"
+                      AutoGenerateColumns="False" HeadersVisibility="None">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Question" Binding="{Binding Text ,UpdateSourceTrigger=PropertyChanged}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button Grid.Row="5" Grid.Column="0" Content="Hozzáadás"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                Width="73"  Height="21"  Margin="5"
+                Command="{Binding AddNewAnswerCommand}"/>
+        
+        <TextBox Grid.Row="5" Grid.Column="1" Margin="5"
+                 Text="{Binding Answertext, UpdateSourceTrigger=PropertyChanged}" />
+
+
+        <Label Grid.Row="6" Grid.Column="0" Content="Felhasználók:" VerticalAlignment="Center" />
+        <DataGrid VerticalScrollBarVisibility="Auto" ItemsSource="{Binding Users}" Grid.Row="6" Grid.Column="1"
+                      VerticalContentAlignment="Stretch" 
+                      AutoGenerateColumns="False" HeadersVisibility="Column"
+                          SelectedItem="{Binding SelectedUser, UpdateSourceTrigger=PropertyChanged}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                                Command="{Binding SelectUserCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="True" Header="Question" Binding="{Binding User.Email}" Width="3*" />
+                <DataGridCheckBoxColumn Header="Hozzárendelve" 
+                                        
+                                        Binding="{Binding IsSelected ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  
+                                        Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Grid.Row="7" Grid.Column="0" Content="Cancel"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                Width="73"  Height="21"  Margin="5"
+                IsCancel="True"
+                Command="{Binding CancelNewPollCommand}"/>
+
+        <Button Grid.Row="7" Grid.Column="1" Content="Save"
+                HorizontalAlignment="Right" VerticalAlignment="Center"
+                Width="73"  Height="21"  Margin="5"
+                IsDefault="True"
+                Command="{Binding SaveNewPollCommand}"/>
+    </Grid>
+</Window>

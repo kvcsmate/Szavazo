@@ -1,30 +1,26 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Persistence;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Linq;
 
-namespace Persistence
+namespace ApiTest
 {
-    public class DbInitializer
+    public class TestDbInit
     {
         private static UserManager<User> _userManager;
-        public static void Initialize(SzavazoDbContext context, IServiceProvider _serviceProvider)
+        public static void Initialize(SzavazoDbContext context)
         {
-            _userManager = _serviceProvider.GetRequiredService<UserManager<User>>();
 
-            if (context.Users.Any())
-            {
-                return;
-            }
-
-
+            _userManager = new UserManager<User>(
+            new UserStore<User>(context), null,
+            new PasswordHasher<User>(), null, null, null, null, null, null);
             //context.Database.Migrate(); //progam automatikusan migrál
 
-            context.Database.EnsureDeleted();
-           context.Database.EnsureCreated();
+            //context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
             //return;
             var defaultUsers = new User[]
             {
@@ -39,6 +35,7 @@ namespace Persistence
             {
                 new Poll
                 {
+                    Id = 1,
                     Creator = defaultUsers[0],
                     Start = DateTime.Now,
                     End = DateTime.Now.AddDays(10),
@@ -52,6 +49,7 @@ namespace Persistence
                 },
                 new Poll
                 {
+                    Id = 2,
                     Creator = defaultUsers[1],
                     Start = DateTime.Now.AddDays(-10),
                     End = DateTime.Now.AddDays(1),
@@ -66,6 +64,7 @@ namespace Persistence
                 },
                 new Poll
                 {
+                    Id = 3,
                     Creator = defaultUsers[2],
                     Start = DateTime.Now.AddDays(-1),
                     End = DateTime.Now.AddDays(5),
@@ -80,6 +79,7 @@ namespace Persistence
                 },
                 new Poll
                 {
+                    Id = 4,
                     Creator = defaultUsers[0],
                     Start = DateTime.Now.AddDays(-10),
                     End = DateTime.Now.AddDays(-1),
@@ -93,6 +93,7 @@ namespace Persistence
                 },
                 new Poll
                 {
+                    Id = 5,
                     Creator = defaultUsers[0],
                     Start = DateTime.Now.AddDays(-10),
                     End = DateTime.Now.AddDays(10),
@@ -116,7 +117,7 @@ namespace Persistence
             var users = _userManager.Users.ToList();
             foreach (var poll in defaultpolls)
             {
-                
+
                 foreach (var user in users)
                 {
                     pollBindings.Add(new PollBinding
@@ -126,7 +127,7 @@ namespace Persistence
                         User = user
                     });
                 }
-                
+
             }
             //lezárt szavazás 
 
@@ -136,6 +137,5 @@ namespace Persistence
             context.AddRange(defaultpolls);
             context.SaveChanges();
         }
-
     }
 }

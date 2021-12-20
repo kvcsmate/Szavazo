@@ -29,7 +29,7 @@ namespace Szavazo.Controllers
             {
                 return View(service.GetPollsByCurrentUser(GetCurrentUser()));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return RedirectToAction("Index", "Error");
                 

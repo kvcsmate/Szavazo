@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Persistence.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,55 @@ namespace Persistence
             return _context.PollBindings.Where(p => p.User == user).ToList();
         }
 
+        public List<PollBindingDto> GetPollBindingDtos(int pollId)
+        {
+            var pollBindings = _context.PollBindings.Where(p => p.Poll.Id == pollId).Include(u=> u.User).ToList();
+            List<PollBindingDto> pollBindingDtos = new List<PollBindingDto>();
+            foreach (var pollBinding in pollBindings)
+            {
+                pollBindingDtos.Add(new PollBindingDto
+                {
+                    Id=pollBinding.Id,
+                    IsVoted = pollBinding.IsVoted,
+                    PollId = pollId,
+                    User = pollBinding.User
+                });
+            }
+            return pollBindingDtos;
+        }
+
+        public List<PollDto> GetPollsByCreator(User user)
+        {
+            List<Poll> polls = _context.Polls.Where(p => p.Creator == user).ToList();
+            List<PollDto> pollDtos = new List<PollDto>();
+            foreach (var poll in polls)
+            {
+                pollDtos.Add (new PollDto
+                {
+                    Creator = poll.Creator,
+                    End = poll.End,
+                    Id = poll.Id,
+                    Question = poll.Question,
+                    Start = poll.Start,
+                    
+                });
+            }
+            return pollDtos;
+        }
+
+        public List<PollBinding> GetPollBindingsByPoll(int pollId)
+        {
+            return _context.PollBindings.Where(pb => pb.Poll.Id == pollId).ToList();
+        }
+
         public User GetUser(string currentUserId)
         {
             return _context.Users.First(u => u.Id == currentUserId);
+        }
+
+        public List<User> GetUsers()
+        {
+            return _context.Users.ToList();
         }
 
         public List<Poll> GetPollsByCurrentUser(User user)
@@ -104,6 +151,49 @@ namespace Persistence
                 }
             }
             _context.SaveChanges();
+        }
+        public bool CreatePoll(PollCreateRequest request)
+        {
+            try
+            {
+                var poll = new Poll
+                {
+                    Creator = _context.Users.First(u => u.Id == request.Poll.Creator.Id),
+                    End = request.Poll.End,
+                    Question = request.Poll.Question,
+                    Start = request.Poll.Start,
+                };
+                poll.Options = new List<Answer>();
+
+                foreach (var answerdto in request.Answers)
+                {
+                    poll.Options.Add(new Answer
+                    {
+                        Text = answerdto.Text,
+                    });
+                }
+
+                _context.Add(poll);
+                var PollBindings = new List<PollBinding>();
+                foreach (var id in request.UserIds)
+                {
+                    PollBindings.Add(new PollBinding
+                    {
+                        IsVoted = false,
+                        Poll = poll,//_context.Polls.First(p=> p.Question == poll.Question),
+                        User = _context.Users.First(u => u.Id==id)
+                    }) ;
+
+                }
+                _context.AddRange(PollBindings);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            
         }
     }
 }

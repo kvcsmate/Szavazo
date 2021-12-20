@@ -21,6 +21,10 @@ namespace Persistence
         { 
             
         }
+        public SzavazoDbContext()
+        {
+
+        }
 
     }
 }
