@@ -60,10 +60,26 @@ namespace ApiTest
                 {
                     Assert.Equal(item.PollId, pollId);
                 }
+
         }
         [Theory]
-
-        //[InlineData(1)]
+        [InlineData(234)]
+        public void GetPollBindingsNullTest(int pollId)
+        {
+            var result = _pollsController.GetPollBindings(pollId);
+            var content = Assert.IsAssignableFrom<List<PollBindingDto>>(result);
+            Assert.Empty(content);
+        }
+        [Theory]
+        [InlineData(234)]
+        public void GetAnswerNullTest(int pollId)
+        {
+            var result = _pollsController.GetAnswers(pollId);
+            var content = Assert.IsAssignableFrom<List<AnswerDto>>(result);
+            Assert.Empty(content);
+        }
+        [Theory]
+        [InlineData(1)]
         [InlineData(2)]
         [InlineData(3)]
         [InlineData(4)]
